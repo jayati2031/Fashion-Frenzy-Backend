@@ -1,7 +1,10 @@
 package com.example.fashionfrenzy;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+@Component
 public class ProductSorter {
     // Merge Sort implementation for sorting products based on a given comparator
     public static void mergeSort(List<Map<String, String>> products, Comparator<Map<String, String>> comparator, boolean ascending) {
@@ -66,30 +69,7 @@ public class ProductSorter {
         return Double.parseDouble(cleanedPrice);
     }
 
-    public static void main(String[] args) {
-        // Assuming you have a list of file paths for the selected category
-        List<String> filePaths = new ArrayList<>();
-        filePaths.add("src\\main\\resources\\womenAmazonDresses.xlsx");
-        filePaths.add("src\\main\\resources\\womenBoohooDresses.xlsx");
-        filePaths.add("src\\main\\resources\\womenRevolveDresses.xlsx");
-
-        List<Map<String, String>> products = FetchProductsFromExcelBasedOnCategory.readData(filePaths);
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Choose sorting criteria:");
-        System.out.println("1. Brand");
-        System.out.println("2. Title");
-        System.out.println("3. Price");
-        System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
-
-        System.out.println("Choose sorting order:");
-        System.out.println("1. Ascending");
-        System.out.println("2. Descending");
-        System.out.print("Enter your choice: ");
-        int orderChoice = scanner.nextInt();
-        boolean ascending = orderChoice == 1;
-
+    public static void sortAndDisplayProducts(List<Map<String, String>> products, Integer choice, boolean ascending) {
         Comparator<Map<String, String>> comparator = switch (choice) {
             case 1 -> ProductSorter.getBrandComparator();
             case 2 -> ProductSorter.getTitleComparator();
@@ -99,8 +79,8 @@ public class ProductSorter {
                 yield ProductSorter.getBrandComparator();
             }
         };
-        mergeSort(products, comparator, ascending);
 
+        mergeSort(products, comparator, ascending);
         for (Map<String, String> product : products) {
             System.out.println("Image: " + product.get("Image"));
             System.out.println("Brand: " + product.get("Brand"));
@@ -109,6 +89,5 @@ public class ProductSorter {
             System.out.println("Url: " + product.get("URL"));
             System.out.println();
         }
-        scanner.close();
     }
 }

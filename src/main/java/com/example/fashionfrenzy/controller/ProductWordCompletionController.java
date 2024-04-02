@@ -11,11 +11,9 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/products")
 public class ProductWordCompletionController {
-    private final ProductWordCompletion productWordCompletion;
     private final FetchProductsController fetchProductsController;
 
-    public ProductWordCompletionController(ProductWordCompletion productWordCompletion, FetchProductsController fetchProductsController) {
-        this.productWordCompletion = productWordCompletion;
+    public ProductWordCompletionController(FetchProductsController fetchProductsController) {
         this.fetchProductsController = fetchProductsController;
     }
 
@@ -23,7 +21,7 @@ public class ProductWordCompletionController {
     public List<String> suggestWords(@RequestParam String gender, @RequestParam String category, @RequestParam String prefix) {
         List<Map<String, String>> products = fetchProductsController.getProductsByCategory(gender, category);
         loadProductsIntoTrie(products);
-        return productWordCompletion.suggestWords(prefix);
+        return ProductWordCompletion.suggestWords(prefix);
     }
 
     private void loadProductsIntoTrie(List<Map<String, String>> products) {
@@ -33,7 +31,7 @@ public class ProductWordCompletionController {
             for (String titleWord : titleWords) {
                 titleWord = titleWord.replaceAll("[^a-zA-Z]", "").toLowerCase();
                 if (!titleWord.isEmpty()) {
-                    productWordCompletion.wordInsert(titleWord);
+                    ProductWordCompletion.wordInsert(titleWord);
                 }
             }
         }

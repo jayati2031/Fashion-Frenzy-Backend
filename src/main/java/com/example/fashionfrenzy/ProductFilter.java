@@ -2,6 +2,7 @@ package com.example.fashionfrenzy;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +21,7 @@ class BTreeNode {
     }
 }
 
+@Component
 public class ProductFilter {
     private static final int MIN_DEGREE = 3; // Minimum degree of the B-tree
     private BTreeNode root;
@@ -112,22 +114,6 @@ public class ProductFilter {
         }
     }
 
-
-    // Read all product information from Excel files and insert into the B-tree
-    private void readAndInsertAllProducts(String[] files) throws IOException {
-        for (String file : files) {
-            try {
-                List<Map<String, String>> data = readProductInfoFromExcel(file);
-                for (Map<String, String> product : data) {
-                    insert(product);
-                }
-            } catch (IOException e) {
-                System.err.println("An error occurred while reading product information from " + file + ": " + e.getMessage());
-                throw e;
-            }
-        }
-    }
-
     // Read product information from Excel file
     private List<Map<String, String>> readProductInfoFromExcel(String filePath) throws IOException {
         List<Map<String, String>> products = new ArrayList<>();
@@ -161,15 +147,17 @@ public class ProductFilter {
     }
 
     // Filter products by brands
-    private void filterProductsByBrands(String[] brands) throws IOException {
+    public List<Map<String, String>> filterProductsByBrands(String[] brands) throws IOException {
         List<Map<String, String>> products = getAllProducts();
 
         System.out.println("Products for selected brand(s):");
+        List<Map<String, String>> filteredProducts = new ArrayList<>();
         for (String brandInput : brands) {
             boolean brandFound = false;
             for (Map<String, String> product : products) {
                 String brand = product.get("Brand");
                 if (brand.toLowerCase().contains(brandInput.trim().toLowerCase())) {
+                    filteredProducts.add(product);
                     printProductInfo(product);
                     brandFound = true;
                 }
@@ -178,10 +166,11 @@ public class ProductFilter {
                 System.out.println("Sorry!... Brand with the name " + brandInput + " doesn't exist");
             }
         }
+        return filteredProducts;
     }
 
     // Filter products by both brand and price range
-    private void filterProductsByBothBrandAndPriceRange(String[] brands, double minPrice, double maxPrice) throws IOException {
+    public List<Map<String, String>> filterProductsByBothBrandAndPriceRange(String[] brands, double minPrice, double maxPrice) throws IOException {
         List<Map<String, String>> products = getAllProducts();
 
         System.out.println("Products for selected brand(s) and price range:");
@@ -215,6 +204,7 @@ public class ProductFilter {
             filteredProducts.sort(Comparator.comparingDouble(p -> Double.parseDouble(p.get("Price").replaceAll("[^\\d.]", ""))));
             printProducts(filteredProducts);
         }
+        return filteredProducts;
     }
 
     // Read all product information from Excel files
@@ -236,83 +226,6 @@ public class ProductFilter {
             }
         }
         return products;
-    }
-
-    // Main method
-    public static void main(String[] args) {
-        ProductFilter productFilter = new ProductFilter();
-        String[] files = {
-                "src\\main\\resources\\womenBoohooDress.xlsx",
-                "src\\main\\resources\\womenAmazonDress.xlsx",
-                "src\\main\\resources\\womenRevolveDress.xlsx"};
-        try {
-            productFilter.readAndInsertAllProducts(files);
-        } catch (IOException e) {
-            System.err.println("An error occurred while reading product information: " + e.getMessage());
-            return;
-        }
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            double minPrice, maxPrice;
-            String brandInput;
-            String[] brands;
-
-            while (true) {
-                System.out.println("Select the filtering option:");
-                System.out.println("1. Based on Brands");
-                System.out.println("2. Based on Price Range");
-                System.out.println("3. Based on both Brand and Price Range");
-                System.out.println("4. Exit");
-
-                int option = scanner.nextInt();
-                switch (option) {
-                    case 1:
-                        System.out.print("Enter brand names separated by commas: ");
-                        scanner.nextLine(); // Consume newline
-                        brandInput = scanner.nextLine();
-                        brands = brandInput.split(",");
-                        try {
-                            productFilter.filterProductsByBrands(brands);
-                        } catch (IOException e) {
-                            System.err.println("An error occurred while filtering products by brands: " + e.getMessage());
-                        }
-                        break;
-                    case 2:
-                        System.out.print("Enter the minimum price: ");
-                        minPrice = scanner.nextDouble();
-                        System.out.print("Enter the maximum price: ");
-                        maxPrice = scanner.nextDouble();
-                        List<Map<String, String>> filteredProductsByPrice = productFilter.searchProductsByPriceRange(minPrice, maxPrice);
-                        if (!filteredProductsByPrice.isEmpty()) {
-                            System.out.println("Products in the price range $" + minPrice + " - $" + maxPrice + ":\n");
-                            productFilter.printProducts(filteredProductsByPrice);
-                        } else {
-                            System.out.println("No products found in the specified price range.");
-                        }
-                        break;
-                    case 3:
-                        System.out.print("Enter brand names separated by commas: ");
-                        scanner.nextLine(); // Consume newline
-                        brandInput = scanner.nextLine();
-                        brands = brandInput.split(",");
-                        System.out.print("Enter the minimum price: ");
-                        minPrice = scanner.nextDouble();
-                        System.out.print("Enter the maximum price: ");
-                        maxPrice = scanner.nextDouble();
-                        try {
-                            productFilter.filterProductsByBothBrandAndPriceRange(brands, minPrice, maxPrice);
-                        } catch (IOException e) {
-                            System.err.println("An error occurred while filtering products by both brand and price range: " + e.getMessage());
-                        }
-                        break;
-                    case 4:
-                        System.out.println("Exiting...");
-                        return;
-                    default:
-                        System.out.println("Invalid option selected.");
-                }
-            }
-        }
     }
 
     // Print product information

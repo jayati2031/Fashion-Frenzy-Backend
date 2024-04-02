@@ -32,8 +32,4 @@ public class FashionWebsitesWebScrapper {
             webScrapRevolve.crawlRevolveJs("https://www.revolve.com/", "Men", mCtgry, "src/main/resources/menRevolve" + mCtgry + ".xlsx");
         }
     }
-
-    public static void main(String[] args) {
-        scrapeProductInfo();
-    }
 }

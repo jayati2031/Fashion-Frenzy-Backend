@@ -100,7 +100,7 @@ public class WebScrapBoohoo {
                 }
 
                 // Write product information to xlsx
-                writeProductInfoToXLSX(category, images, title, price, urls, fileName);
+                writeProductInfoToXLSX(images, title, price, urls, fileName);
             } else {
                 System.out.println("No product found.");
             }
@@ -109,11 +109,17 @@ public class WebScrapBoohoo {
         }
     }
 
-    private void writeProductInfoToXLSX(String category, List<String> image, List<String> title, List<String> price, List<String> url, String fileName) throws IOException {
+    private void writeProductInfoToXLSX(List<String> image, List<String> title, List<String> price, List<String> url, String fileName) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Product Info");
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Category", "Image", "Brand", "Title", "Price", "URL"};
+            String[] headers = {"Id", "Image", "Brand", "Title", "Price", "URL"};
+
+            String fileNameWithExtension = fileName.substring(fileName.lastIndexOf('/') + 1);
+            String fileNameWithoutExtension = fileNameWithExtension.substring(0, fileNameWithExtension.lastIndexOf('.'));
+            String[] parts = fileNameWithoutExtension.split("(?=[A-Z])");
+            String convertedName = String.join("_", parts).toLowerCase();
+
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -121,7 +127,7 @@ public class WebScrapBoohoo {
             int rowCount = 1;
             for (int j = 0; j < image.size() && j < title.size() && j < price.size() && j < url.size(); j++) {
                 Row row = sheet.createRow(rowCount++);
-                row.createCell(0).setCellValue(category);
+                row.createCell(0).setCellValue(convertedName + "_" + (j+1));
                 row.createCell(1).setCellValue(image.get(j));
                 row.createCell(2).setCellValue("Boohoo");
                 row.createCell(3).setCellValue(title.get(j));
@@ -133,11 +139,5 @@ public class WebScrapBoohoo {
             }
         }
         System.out.println("Product information has been written to " + fileName);
-    }
-
-    public static void main(String[] args) {
-        WebScrapBoohoo webScrapBoohoo = new WebScrapBoohoo();
-        // change this to take a list of URLs
-        webScrapBoohoo.crawlBoohooJs("https://ca.boohoo.com/", "Men", "hoodies", "product_info.xlsx");
     }
 }

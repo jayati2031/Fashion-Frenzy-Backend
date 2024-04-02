@@ -19,14 +19,14 @@ class NodeOfTrie1 {
 
 @Component
 public class ProductWordCompletion {
-    private final NodeOfTrie1 rt;
+    private static NodeOfTrie1 rt = null;
 
     public ProductWordCompletion() {
         rt = new NodeOfTrie1('\0');
     }
 
     // Insert a word into the Trie
-    public void wordInsert(String word) {
+    public static void wordInsert(String word) {
         NodeOfTrie1 current = rt;
 
         for (char ch : word.toCharArray()) {
@@ -41,7 +41,7 @@ public class ProductWordCompletion {
     }
 
     // Suggest words based on a given prefix
-    public List<String> suggestWords(String prefix) {
+    public static List<String> suggestWords(String prefix) {
         NodeOfTrie1 prefixNode = nodeFinding(prefix);
         List<String> suggestions = new ArrayList<>();
 
@@ -56,7 +56,7 @@ public class ProductWordCompletion {
     }
 
     // Helper method to search for a node in the Trie
-    private NodeOfTrie1 nodeFinding(String wd) {
+    private static NodeOfTrie1 nodeFinding(String wd) {
         NodeOfTrie1 current = rt;
 
         for (char ch : wd.toCharArray()) {
@@ -71,7 +71,7 @@ public class ProductWordCompletion {
     }
 
     // Helper method to recursively suggest words
-    private void suggestWordsHelper(String prefix, NodeOfTrie1 node, List<String> suggestions) {
+    private static void suggestWordsHelper(String prefix, NodeOfTrie1 node, List<String> suggestions) {
         if (node.isEndOfWord) {
             suggestions.add(prefix);
         }

@@ -27,8 +27,27 @@ public class FetchProductsController {
                 categories = categoriesForWomen;
             }
             for (String category : categories) {
-                allProducts.addAll(getProductsByCategory(gender, category));
+                allProducts.addAll(getLimitedProductsByCategory(gender, category));
             }
+        }
+        return allProducts;
+    }
+
+    @GetMapping("/gender")
+    public List<Map<String, String>> getProductsByGender(@RequestParam String gender) {
+        String genderChoice = gender.toLowerCase();
+        if (isValidGender(genderChoice)) {
+            throw new IllegalArgumentException("Invalid gender");
+        }
+        List<Map<String, String>> allProducts = new ArrayList<>();
+        List<String> categories;
+        if (genderChoice.equals("men")) {
+            categories = List.of("shirt", "hoodie", "jeans", "coat", "sweater");
+        } else {
+            categories = List.of("dress", "top", "jeans", "coat", "sweater");
+        }
+        for (String category : categories) {
+            allProducts.addAll(getLimitedProductsByCategory(gender, category));
         }
         return allProducts;
     }
@@ -37,7 +56,7 @@ public class FetchProductsController {
     public List<Map<String, String>> getProductsByCategory(@RequestParam String gender, @RequestParam String category) {
         String genderChoice = gender.toLowerCase();
         String categoryChoice = category.toLowerCase();
-        if (!isValidGender(genderChoice) || !isValidCategory(categoryChoice)) {
+        if (isValidGender(genderChoice) || !isValidCategory(categoryChoice)) {
             throw new IllegalArgumentException("Invalid gender or category");
         }
         String categoryCapitalized = categoryChoice.substring(0, 1).toUpperCase() + categoryChoice.substring(1);
@@ -48,8 +67,21 @@ public class FetchProductsController {
         return FetchProductsFromExcelBasedOnCategory.readData(filePaths);
     }
 
+    private List<Map<String, String>> getLimitedProductsByCategory(String gender, String category) {
+        List<Map<String, String>> products = getProductsByCategory(gender, category);
+        List<Map<String, String>> limitedProducts = new ArrayList<>();
+        int count = 0;
+        for (Map<String, String> product : products) {
+            if (count < 10) {
+                limitedProducts.add(product);
+                count++;
+            }
+        }
+        return limitedProducts;
+    }
+
     private boolean isValidGender(String gender) {
-        return gender.equals("men") || gender.equals("women");
+        return !gender.equals("men") && !gender.equals("women");
     }
 
     private boolean isValidCategory(String category) {
