@@ -52,8 +52,8 @@ public class TrendingSearch {
         try {
             FileOutputStream fileOut = new FileOutputStream(FILE_NAME);
             Workbook workbook = new XSSFWorkbook();
-            Sheet sheet = workbook.createSheet("Most Searched Queries");
             workbook.write(fileOut);
+            workbook.close();
             fileOut.close();
         } catch (IOException e) {
             e.printStackTrace();

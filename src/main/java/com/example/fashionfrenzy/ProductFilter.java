@@ -252,64 +252,65 @@ public class ProductFilter {
             return;
         }
 
-        Scanner scanner = new Scanner(System.in);
-        double minPrice, maxPrice;
-        String brandInput;
-        String[] brands;
+        try (Scanner scanner = new Scanner(System.in)) {
+            double minPrice, maxPrice;
+            String brandInput;
+            String[] brands;
 
-        while (true) {
-            System.out.println("Select the filtering option:");
-            System.out.println("1. Based on Brands");
-            System.out.println("2. Based on Price Range");
-            System.out.println("3. Based on both Brand and Price Range");
-            System.out.println("4. Exit");
+            while (true) {
+                System.out.println("Select the filtering option:");
+                System.out.println("1. Based on Brands");
+                System.out.println("2. Based on Price Range");
+                System.out.println("3. Based on both Brand and Price Range");
+                System.out.println("4. Exit");
 
-            int option = scanner.nextInt();
-            switch (option) {
-                case 1:
-                    System.out.print("Enter brand names separated by commas: ");
-                    scanner.nextLine(); // Consume newline
-                    brandInput = scanner.nextLine();
-                    brands = brandInput.split(",");
-                    try {
-                        productFilter.filterProductsByBrands(brands);
-                    } catch (IOException e) {
-                        System.err.println("An error occurred while filtering products by brands: " + e.getMessage());
-                    }
-                    break;
-                case 2:
-                    System.out.print("Enter the minimum price: ");
-                    minPrice = scanner.nextDouble();
-                    System.out.print("Enter the maximum price: ");
-                    maxPrice = scanner.nextDouble();
-                    List<Map<String, String>> filteredProductsByPrice = productFilter.searchProductsByPriceRange(minPrice, maxPrice);
-                    if (!filteredProductsByPrice.isEmpty()) {
-                        System.out.println("Products in the price range $" + minPrice + " - $" + maxPrice + ":\n");
-                        productFilter.printProducts(filteredProductsByPrice);
-                    } else {
-                        System.out.println("No products found in the specified price range.");
-                    }
-                    break;
-                case 3:
-                    System.out.print("Enter brand names separated by commas: ");
-                    scanner.nextLine(); // Consume newline
-                    brandInput = scanner.nextLine();
-                    brands = brandInput.split(",");
-                    System.out.print("Enter the minimum price: ");
-                    minPrice = scanner.nextDouble();
-                    System.out.print("Enter the maximum price: ");
-                    maxPrice = scanner.nextDouble();
-                    try {
-                        productFilter.filterProductsByBothBrandAndPriceRange(brands, minPrice, maxPrice);
-                    } catch (IOException e) {
-                        System.err.println("An error occurred while filtering products by both brand and price range: " + e.getMessage());
-                    }
-                    break;
-                case 4:
-                    System.out.println("Exiting...");
-                    return;
-                default:
-                    System.out.println("Invalid option selected.");
+                int option = scanner.nextInt();
+                switch (option) {
+                    case 1:
+                        System.out.print("Enter brand names separated by commas: ");
+                        scanner.nextLine(); // Consume newline
+                        brandInput = scanner.nextLine();
+                        brands = brandInput.split(",");
+                        try {
+                            productFilter.filterProductsByBrands(brands);
+                        } catch (IOException e) {
+                            System.err.println("An error occurred while filtering products by brands: " + e.getMessage());
+                        }
+                        break;
+                    case 2:
+                        System.out.print("Enter the minimum price: ");
+                        minPrice = scanner.nextDouble();
+                        System.out.print("Enter the maximum price: ");
+                        maxPrice = scanner.nextDouble();
+                        List<Map<String, String>> filteredProductsByPrice = productFilter.searchProductsByPriceRange(minPrice, maxPrice);
+                        if (!filteredProductsByPrice.isEmpty()) {
+                            System.out.println("Products in the price range $" + minPrice + " - $" + maxPrice + ":\n");
+                            productFilter.printProducts(filteredProductsByPrice);
+                        } else {
+                            System.out.println("No products found in the specified price range.");
+                        }
+                        break;
+                    case 3:
+                        System.out.print("Enter brand names separated by commas: ");
+                        scanner.nextLine(); // Consume newline
+                        brandInput = scanner.nextLine();
+                        brands = brandInput.split(",");
+                        System.out.print("Enter the minimum price: ");
+                        minPrice = scanner.nextDouble();
+                        System.out.print("Enter the maximum price: ");
+                        maxPrice = scanner.nextDouble();
+                        try {
+                            productFilter.filterProductsByBothBrandAndPriceRange(brands, minPrice, maxPrice);
+                        } catch (IOException e) {
+                            System.err.println("An error occurred while filtering products by both brand and price range: " + e.getMessage());
+                        }
+                        break;
+                    case 4:
+                        System.out.println("Exiting...");
+                        return;
+                    default:
+                        System.out.println("Invalid option selected.");
+                }
             }
         }
     }

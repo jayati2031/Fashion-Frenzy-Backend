@@ -1,5 +1,7 @@
 package com.example.fashionfrenzy;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
 //TrieNode1 class represents a node in the Trie data structure
@@ -15,11 +17,11 @@ class NodeOfTrie1 {
     }
 }
 
-//Trie class implements the Trie data structure
-class DSTrie {
+@Component
+public class ProductWordCompletion {
     private final NodeOfTrie1 rt;
 
-    public DSTrie() {
+    public ProductWordCompletion() {
         rt = new NodeOfTrie1('\0');
     }
 
@@ -39,14 +41,18 @@ class DSTrie {
     }
 
     // Suggest words based on a given prefix
-    public void suggestWords(String prefix) {
+    public List<String> suggestWords(String prefix) {
         NodeOfTrie1 prefixNode = nodeFinding(prefix);
+        List<String> suggestions = new ArrayList<>();
 
         if (prefixNode != null) {
-            suggestWordsHelper(prefix, prefixNode);
+            suggestWordsHelper(prefix, prefixNode, suggestions);
         } else {
-            System.out.println("No suggestions for the given prefix.");
+            // Instead of printing, throw an exception or return an empty list.
+            throw new IllegalArgumentException("No suggestions for the given prefix.");
         }
+
+        return suggestions;
     }
 
     // Helper method to search for a node in the Trie
@@ -65,58 +71,15 @@ class DSTrie {
     }
 
     // Helper method to recursively suggest words
-    private void suggestWordsHelper(String prefix, NodeOfTrie1 node) {
+    private void suggestWordsHelper(String prefix, NodeOfTrie1 node, List<String> suggestions) {
         if (node.isEndOfWord) {
-            System.out.println(prefix);
+            suggestions.add(prefix);
         }
 
         for (int i = 0; i < 26; i++) {
             if (node.children[i] != null) {
-                suggestWordsHelper(prefix + node.children[i].data, node.children[i]);
+                suggestWordsHelper(prefix + node.children[i].data, node.children[i], suggestions);
             }
         }
-    }
-}
-
-public class ProductWordCompletion {
-
-    public static void main(String[] args) {
-        List<String> filePaths = new ArrayList<>();
-        filePaths.add("src\\main\\resources\\womenAmazonDresses.xlsx");
-        filePaths.add("src\\main\\resources\\womenBoohooDresses.xlsx");
-        filePaths.add("src\\main\\resources\\womenRevolveDresses.xlsx");
-
-        List<Map<String, String>> products = FetchProductsFromExcelBasedOnCategory.readData(filePaths);
-        DSTrie trie = new DSTrie();
-
-        for (Map<String, String> product : products) {
-            String title = product.get("Title");
-            String[] titleWords = title.split("\\s+");
-            for (String titleWord : titleWords) {
-                // For simplicity, remove non-alphabetic characters
-                titleWord = titleWord.replaceAll("[^a-zA-Z]", "").toLowerCase();
-                if (!titleWord.isEmpty()) {
-                    trie.wordInsert(titleWord);
-                }
-            }
-        }
-
-        Scanner scanner = new Scanner(System.in);
-
-        // Continuous user input
-        boolean menu = true;
-        while(menu)
-        {
-            System.out.println("Enter \"exit\" to exit.");
-            System.out.print("Enter the title to search for: ");
-            String searchTitle = scanner.nextLine();
-            if ("exit".equalsIgnoreCase(searchTitle)) {
-                System.out.println("Exiting..");
-                menu = false;
-            } else if (!searchTitle.isEmpty()) {
-                trie.suggestWords(searchTitle);
-            }
-        }
-        scanner.close();
     }
 }
