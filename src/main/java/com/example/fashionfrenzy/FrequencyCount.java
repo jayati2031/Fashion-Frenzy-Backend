@@ -2,18 +2,15 @@ package com.example.fashionfrenzy;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.*;
 
 // Frequency Count using HashMap
+@Component
 public class FrequencyCount {
     private static final String OUTPUT_FILE_PATH = "FrequencyCount.xlsx";
-
-    public static void main(String[] args) {
-//        FrequencyCount frequencyCount = new FrequencyCount();
-//        frequencyCount.run();
-    }
 
     public void run(String searchQuery, List<String> filePaths) {
         List<List<Map<String, String>>> allProductsLists = readDataFromExcel(filePaths);

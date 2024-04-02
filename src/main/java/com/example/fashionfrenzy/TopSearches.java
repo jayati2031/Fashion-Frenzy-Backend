@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+@Component
 public class TopSearches {
 
     private static final String SEARCH_HISTORY_FILE = "SearchHistory.xlsx";

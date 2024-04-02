@@ -2,12 +2,13 @@ package com.example.fashionfrenzy;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+@Component
 public class PageRanking {
     // Main method to run the program
     public List<Map<String, String>> run(String searchQuery, List<String> filePaths) {
