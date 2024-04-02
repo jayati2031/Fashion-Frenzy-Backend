@@ -26,13 +26,14 @@ public class SendDealsController {
 
     @PostMapping("/send-deals")
     public String sendDeals(@RequestParam("to") String to, Model model) {
-        boolean isSent = sendDeals.sendEmail(to, "frenzyfashionacc@gmail.com", "Fashion-Frenzy Top Deals", getFashionDealText());
-        if (isSent) {
-            model.addAttribute("message", "Email sent successfully!");
-        } else {
-            model.addAttribute("message", "There was a problem sending the email.");
-        }
+//        boolean isSent = sendDeals.sendEmail(to, "frenzyfashionacc@gmail.com", "Fashion-Frenzy Top Deals", getFashionDealText());
+//        if (isSent) {
+//            model.addAttribute("message", "Email sent successfully!");
+//        } else {
+//            model.addAttribute("message", "There was a problem sending the email.");
+//        }
         return "send-deals";
+
     }
 
     private String getFashionDealText() {
