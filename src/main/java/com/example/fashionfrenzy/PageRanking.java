@@ -8,9 +8,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This class implements page ranking based on frequency count of search queries in Excel files.
+ */
 @Component
 public class PageRanking {
-    // Main method to run the program
+
+    /**
+     * Runs the page ranking algorithm.
+     *
+     * @param searchQuery The search query to rank pages against
+     * @param filePaths   The list of file paths to Excel files containing product data
+     * @return A list of maps containing filtered product data based on the search query
+     */
     public List<Map<String, String>> run(String searchQuery, List<String> filePaths) {
         try {
             // Get file paths with their frequencies
@@ -33,7 +43,13 @@ public class PageRanking {
         return null; // Return null if an exception occurs
     }
 
-    // Method to get file paths with their frequencies
+    /**
+     * Gets file paths with their frequencies.
+     *
+     * @param filePaths    The list of file paths
+     * @param searchQuery  The search query to calculate frequencies for
+     * @return A map containing file paths and their corresponding frequencies
+     */
     private Map<String, Integer> getFilePathsWithFrequencies(List<String> filePaths, String searchQuery) {
         Map<String, Integer> filePathsWithFrequencies = new HashMap<>();
         for (String filePath : filePaths) {
@@ -52,7 +68,13 @@ public class PageRanking {
         return filePathsWithFrequencies;
     }
 
-    // Method to read titles from an Excel file
+    /**
+     * Reads titles from an Excel file.
+     *
+     * @param filePath The file path of the Excel file
+     * @return A list of titles extracted from the Excel file
+     * @throws IOException if an I/O error occurs while reading the file
+     */
     private List<String> readTitlesFromExcel(String filePath) throws IOException {
         List<String> titles = new ArrayList<>();
         FileInputStream fileInputStream = null;
@@ -98,7 +120,13 @@ public class PageRanking {
         return titles; // Return the list of titles
     }
 
-    // Method to get the total frequency count of a search query within a list of titles
+    /**
+     * Gets the total frequency count of a search query within a list of titles.
+     *
+     * @param titles      The list of titles
+     * @param searchQuery The search query to calculate frequency count for
+     * @return The total frequency count of the search query within the list of titles
+     */
     private int getTotalFrequencyCount(List<String> titles, String searchQuery) {
         int totalCount = 0;
         for (String title : titles) {
@@ -114,7 +142,12 @@ public class PageRanking {
         return totalCount; // Return the total frequency count
     }
 
-    // Method to sort file paths based on their frequencies
+    /**
+     * Sorts file paths based on their frequencies.
+     *
+     * @param filePathsWithFrequencies A map containing file paths and their corresponding frequencies
+     * @return A list of sorted file paths based on their frequencies
+     */
     private List<String> getSortedFilePaths(Map<String, Integer> filePathsWithFrequencies) {
         List<String> sortedFilePaths = new ArrayList<>();
         PriorityQueue<Map.Entry<String, Integer>> priorityQueue = new PriorityQueue<>(

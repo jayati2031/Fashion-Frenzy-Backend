@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.util.regex.Pattern;
 
+/**
+ * Component class for processing user data and managing a CSV file.
+ */
 @Component
 public class GetUserData {
 
@@ -16,6 +19,13 @@ public class GetUserData {
     private static final String USERNAME_REGEX = "^[a-zA-Z]+$";
     private static final Pattern USERNAME_PATTERN = Pattern.compile(USERNAME_REGEX);
 
+    /**
+     * Process user data including name and email address.
+     *
+     * @param name  the user's name
+     * @param email the user's email address
+     * @return a message indicating the outcome of the process
+     */
     public static String processUserData(String name, String email) {
         boolean isValidName = USERNAME_PATTERN.matcher(name).matches();
         boolean isValidEmail = EMAIL_PATTERN.matcher(email).matches();
@@ -34,6 +44,12 @@ public class GetUserData {
         }
     }
 
+    /**
+     * Check if an email address already exists in the userData.csv file.
+     *
+     * @param email the email address to check
+     * @return true if the email exists, false otherwise
+     */
     private static boolean checkIfEmailExists(String email) {
         try {
             File file = new File("userData.csv");
@@ -48,11 +64,18 @@ public class GetUserData {
             }
             br.close();
         } catch (IOException e) {
+            // Handle IOException
             System.out.println("IOException caught: " + e.getMessage());
         }
         return false;
     }
 
+    /**
+     * Write user data (name and email) to the userData.csv file.
+     *
+     * @param name  the user's name
+     * @param email the user's email address
+     */
     private static void writeToCSV(String name, String email) {
         try {
             File file = new File("userData.csv");
@@ -64,6 +87,7 @@ public class GetUserData {
             pw.flush();
             pw.close();
         } catch (IOException e) {
+            // Handle IOException
             System.out.println("IOException caught: " + e.getMessage());
         }
     }

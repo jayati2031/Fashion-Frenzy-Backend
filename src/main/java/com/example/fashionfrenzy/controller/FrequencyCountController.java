@@ -1,5 +1,6 @@
 package com.example.fashionfrenzy.controller;
 
+import com.example.fashionfrenzy.FrequencyCount;
 import com.example.fashionfrenzy.PageRanking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,17 +13,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
-public class PageRankingController {
+public class FrequencyCountController {
 
-    private final PageRanking pageRanking;
+    private final FrequencyCount frequencyCount;
 
     @Autowired
-    public PageRankingController(PageRanking pageRanking) {
-        this.pageRanking = pageRanking;
+    public FrequencyCountController(FrequencyCount frequencyCount) {
+        this.frequencyCount = frequencyCount;
     }
 
-    @GetMapping("/page-rank")
-    public List<Map<String, String>> pageRanking(@RequestParam String gender, @RequestParam String category, @RequestParam String searchQuery) {
+    @GetMapping("/frequency-count")
+    public void getFrequencyCount(@RequestParam String gender, @RequestParam String category, @RequestParam String searchQuery) {
         try {
             // Capitalize the category name
             String categoryCapitalized = category.substring(0, 1).toUpperCase() + category.substring(1);
@@ -33,11 +34,10 @@ public class PageRankingController {
                     .map(website -> String.format("src/main/resources/%s%s%s.xlsx", gender, website, categoryCapitalized))
                     .toList();
             // Run page ranking algorithm
-            return pageRanking.run(searchQuery, filePaths);
+            frequencyCount.run(searchQuery, filePaths);
         } catch (Exception e) {
             // Handle any exceptions and return an empty list if an error occurs
             System.err.println("An error occurred while performing page ranking: " + e.getMessage());
-            return List.of();
         }
     }
 }

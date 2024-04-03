@@ -1,12 +1,9 @@
 package com.example.fashionfrenzy;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -22,14 +19,22 @@ import java.util.ArrayList;
 public class WebScrapAmazon {
     private WebDriver drvrJs;
 
-    public void crawlAmazonJs(String urlToCrwlJs, String genderJs, String categoryJs, String fileNmJs) {
+    /**
+     * Crawls Amazon website using JavaScript to scrape product information based on given parameters.
+     *
+     * @param urlToCrawlJs URL of the Amazon website to crawl.
+     * @param genderJs     Gender category to select on the Amazon page.
+     * @param categoryJs   Product category to search for on the Amazon page.
+     * @param fileNameJs   Name of the Excel file to save the scraped product information.
+     */
+    public void crawlAmazonJs(String urlToCrawlJs, String genderJs, String categoryJs, String fileNameJs) {
         WebDriverManager.chromedriver().setup();
         ChromeOptions optnJs = new ChromeOptions();
         optnJs.addArguments("--start-maximized");
 
         try {
             drvrJs = new ChromeDriver(optnJs);
-            drvrJs.get(urlToCrwlJs);
+            drvrJs.get(urlToCrawlJs);
             WebDriverWait wtJs = new WebDriverWait(drvrJs, Duration.ofSeconds(20));
 
             WebElement drpDwnJs = drvrJs.findElement(By.id("searchDropdownBox"));
@@ -48,7 +53,9 @@ public class WebScrapAmazon {
             srchBxJs.sendKeys(Keys.ENTER);
 
             wtJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
-            scrapeProductInfoJs(fileNmJs);
+            scrapeProductInfoJs(fileNameJs);
+        } catch (WebDriverException e) {
+            System.out.println("The Chrome Amazon tab was closed while the program was still running.");
         } catch (Exception eJs) {
             System.out.println("Exception caught: " + eJs.getMessage());
         } finally {
@@ -58,6 +65,11 @@ public class WebScrapAmazon {
         }
     }
 
+    /**
+     * Scrapes product information from the Amazon page and writes it to an Excel file.
+     *
+     * @param fileName Name of the Excel file to save the scraped product information.
+     */
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
@@ -100,11 +112,26 @@ public class WebScrapAmazon {
             } else {
                 System.out.println("No product found.");
             }
+        } catch (WebDriverException e) {
+            System.out.println("The Chrome Amazon tab was closed while the program was still running.");
+        } catch (NullPointerException npex) {
+            System.out.println("Null Pointer Exception: " + npex.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
+    /**
+     * Writes product information to an Excel file.
+     *
+     * @param image   List of product images.
+     * @param brand   List of product brands.
+     * @param title   List of product titles.
+     * @param price   List of product prices.
+     * @param url     List of product URLs.
+     * @param fileName Name of the Excel file to save the product information.
+     * @throws IOException If an I/O error occurs.
+     */
     private void writeProductInfoToXLSX(List<String> image, List<String> brand, List<String> title, List<String> price, List<String> url, String fileName) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Product Info");

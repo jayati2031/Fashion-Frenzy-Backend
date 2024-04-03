@@ -1,15 +1,9 @@
 package com.example.fashionfrenzy;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -22,49 +16,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebScrapBoohoo {
-    private WebDriver drvrJs;
+    private WebDriver driver;
 
-    public void crawlBoohooJs(String urlToCrwlJs, String ctgryJs, String srchKeyJs, String fileNmJs) {
+    /**
+     * Crawls Boohoo website using JavaScript to scrape product information based on given parameters.
+     *
+     * @param urlToCrawlJs URL of the Boohoo website to crawl.
+     * @param categoryJs   Product category to search for on the Boohoo page.
+     * @param searchKeyJs   Search keyword to use on the Boohoo page.
+     * @param fileNameJs   Name of the Excel file to save the scraped product information.
+     */
+    public void crawlBoohooJs(String urlToCrawlJs, String categoryJs, String searchKeyJs, String fileNameJs) {
         WebDriverManager.chromedriver().setup();
-        ChromeOptions optnJs = new ChromeOptions();
-        optnJs.addArguments("--start-maximized");
+        ChromeOptions optionsJs = new ChromeOptions();
+        optionsJs.addArguments("--start-maximized");
 
         try {
-            drvrJs = new ChromeDriver(optnJs);
-            drvrJs.get(urlToCrwlJs);
-            WebDriverWait wtJs = new WebDriverWait(drvrJs, Duration.ofSeconds(20));
+            driver = new ChromeDriver(optionsJs);
+            driver.get(urlToCrawlJs);
+            WebDriverWait waitJs = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-            WebElement clickAcceptCookies = wtJs.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
+            // Accept cookies
+            WebElement clickAcceptCookies = waitJs.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
             clickAcceptCookies.click();
 
-            WebElement srchBxJs = wtJs.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@role='combobox']"))); // Wait for search box
-            srchBxJs.click(); // Click on search box
-            for (int cd = 0; cd < 50; cd++) { // Loop to clear search box
-                srchBxJs.sendKeys(Keys.BACK_SPACE); // Press backspace key
+            // Perform search
+            WebElement searchBoxJs = waitJs.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@role='combobox']")));
+            searchBoxJs.click();
+            for (int cd = 0; cd < 50; cd++) {
+                searchBoxJs.sendKeys(Keys.BACK_SPACE);
             }
-            srchBxJs.sendKeys(ctgryJs + " " + srchKeyJs); // Enter search keyword
-            srchBxJs.sendKeys(Keys.ENTER); // Press enter to search
+            searchBoxJs.sendKeys(categoryJs + " " + searchKeyJs);
+            searchBoxJs.sendKeys(Keys.ENTER);
 
-            wtJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
-            scrapeProductInfoJs(fileNmJs);
+            waitJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
+            scrapeProductInfoJs(fileNameJs);
+        }  catch (WebDriverException e) {
+            System.out.println("The Chrome Boohoo tab was closed while the program was still running.");
         } catch (Exception eJs) {
             System.out.println("Exception caught: " + eJs.getMessage());
         } finally {
-            if (drvrJs != null) {
-                drvrJs.quit();
+            if (driver != null) {
+                driver.quit();
             }
         }
     }
 
+    /**
+     * Scrapes product information from the Boohoo page and writes it to an Excel file.
+     *
+     * @param fileName Name of the Excel file to save the scraped product information.
+     */
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
-            List<WebElement> imageElements = drvrJs.findElements(By.xpath("(//img[@class='null'])"));
-            List<WebElement> titleElements = drvrJs.findElements(By.className("b-product_tile-link"));
-            List<WebElement> priceElements = drvrJs.findElements(By.xpath("(//span[@class='b-price-item m-new'])"));
-            List<WebElement> urlElements = drvrJs.findElements(By.xpath("(//a[@class='b-product_tile-image_link'])"));
+            List<WebElement> imageElements = driver.findElements(By.xpath("(//img[@class='null'])"));
+            List<WebElement> titleElements = driver.findElements(By.className("b-product_tile-link"));
+            List<WebElement> priceElements = driver.findElements(By.xpath("(//span[@class='b-price-item m-new'])"));
+            List<WebElement> urlElements = driver.findElements(By.xpath("(//a[@class='b-product_tile-image_link'])"));
 
-            if (!imageElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty()|| !urlElements.isEmpty()) {
+            if (!imageElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty() || !urlElements.isEmpty()) {
                 List<String> images = new ArrayList<>();
                 for (WebElement element : imageElements) {
                     String src = element.getAttribute("src");
@@ -92,11 +103,25 @@ public class WebScrapBoohoo {
             } else {
                 System.out.println("No product found.");
             }
+        } catch (NullPointerException npex) {
+            System.out.println("Null Pointer Exception: " + npex.getMessage());
+        } catch (WebDriverException e) {
+            System.out.println("The Chrome Boohoo tab was closed while the program was still running.");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
+    /**
+     * Writes product information to an Excel file.
+     *
+     * @param image   List of product images.
+     * @param title   List of product titles.
+     * @param price   List of product prices.
+     * @param url     List of product URLs.
+     * @param fileName Name of the Excel file to save the product information.
+     * @throws IOException If an I/O error occurs.
+     */
     private void writeProductInfoToXLSX(List<String> image, List<String> title, List<String> price, List<String> url, String fileName) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Product Info");
@@ -115,7 +140,7 @@ public class WebScrapBoohoo {
             int rowCount = 1;
             for (int j = 0; j < image.size() && j < title.size() && j < price.size() && j < url.size(); j++) {
                 Row row = sheet.createRow(rowCount++);
-                row.createCell(0).setCellValue(convertedName + "_" + (j+1));
+                row.createCell(0).setCellValue(convertedName + "_" + (j + 1));
                 row.createCell(1).setCellValue(image.get(j));
                 row.createCell(2).setCellValue("Boohoo");
                 row.createCell(3).setCellValue(title.get(j));

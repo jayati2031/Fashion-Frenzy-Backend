@@ -1,16 +1,9 @@
 package com.example.fashionfrenzy;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -23,64 +16,82 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebScrapRevolve {
-    private WebDriver drvrJs;
+    private WebDriver driver;
 
-    public void crawlRevolveJs(String urlToCrwlJs, String ctgryJs, String srchKeyJs, String fileNmJs) {
+    /**
+     * Crawls the Revolve website using JavaScript to scrape product information based on given parameters.
+     *
+     * @param urlToCrawlJs URL of the Revolve website to crawl.
+     * @param categoryJs   Product category to search for on the Revolve page.
+     * @param searchKeyJs  Search keyword to use on the Revolve page.
+     * @param fileNameJs   Name of the Excel file to save the scraped product information.
+     */
+    public void crawlRevolveJs(String urlToCrawlJs, String categoryJs, String searchKeyJs, String fileNameJs) {
         WebDriverManager.chromedriver().setup();
-        ChromeOptions optnJs = new ChromeOptions();
-        optnJs.addArguments("--start-maximized");
+        ChromeOptions optionsJs = new ChromeOptions();
+        optionsJs.addArguments("--start-maximized");
 
         try {
-            drvrJs = new ChromeDriver(optnJs);
-            drvrJs.get(urlToCrwlJs);
-            WebDriverWait wtJs = new WebDriverWait(drvrJs, Duration.ofSeconds(20));
+            driver = new ChromeDriver(optionsJs);
+            driver.get(urlToCrawlJs);
+            WebDriverWait waitJs = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-            WebElement closeButton = drvrJs.findElement(By.id("ntf_just_let_shop"));
+            // Close pop-up if exists
+            WebElement closeButton = driver.findElement(By.id("ntf_just_let_shop"));
             closeButton.click();
 
+            // Select gender based on category
             WebElement selectGender;
-            if (ctgryJs.equals("Men")) {
-                selectGender = wtJs.until(ExpectedConditions.elementToBeClickable(drvrJs.findElements(By.className("h5-secondary")).get(1)));
+            if (categoryJs.equals("Men")) {
+                selectGender = waitJs.until(ExpectedConditions.elementToBeClickable(driver.findElements(By.className("h5-secondary")).get(1)));
             } else {
-                selectGender = wtJs.until(ExpectedConditions.elementToBeClickable(drvrJs.findElements(By.className("h5-secondary")).get(0)));
+                selectGender = waitJs.until(ExpectedConditions.elementToBeClickable(driver.findElements(By.className("h5-secondary")).get(0)));
             }
             selectGender.click();
 
-            WebElement srchBxJs = wtJs.until(ExpectedConditions.elementToBeClickable(By.id("search_term_new"))); // Wait for search box
-            srchBxJs.click(); // Click on search box
-            srchBxJs.sendKeys(srchKeyJs); // Enter search keyword
-            srchBxJs.sendKeys(Keys.ENTER); // Press enter to search
+            // Perform search
+            WebElement searchBoxJs = waitJs.until(ExpectedConditions.elementToBeClickable(By.id("search_term_new")));
+            searchBoxJs.click();
+            searchBoxJs.sendKeys(searchKeyJs);
+            searchBoxJs.sendKeys(Keys.ENTER);
 
-            wtJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
+            waitJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
 
-            JavascriptExecutor js = (JavascriptExecutor) drvrJs;
-            // Scroll the page by 5000px
+            // Scroll down the page
+            JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("window.scrollBy({ top: 5000, behavior: 'smooth' });");
 
-            scrapeProductInfoJs(fileNmJs);
+            scrapeProductInfoJs(fileNameJs);
+        } catch (WebDriverException e) {
+            System.out.println("The Chrome Revolve tab was closed while the program was still running.");
         } catch (Exception eJs) {
             System.out.println("Exception caught: " + eJs.getMessage());
         } finally {
-            if (drvrJs != null) {
-                drvrJs.quit();
+            if (driver != null) {
+                driver.quit();
             }
         }
     }
 
+    /**
+     * Scrapes product information from the Revolve page and writes it to an Excel file.
+     *
+     * @param fileName Name of the Excel file to save the scraped product information.
+     */
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
             Thread.sleep(2000);
-            List<WebElement> imageElements = drvrJs.findElements(By.className("products-grid__image-link-img"));
-            List<WebElement> titleElements = drvrJs.findElements(By.className("product-name"));
-            List<WebElement> brandElements = drvrJs.findElements(By.className("product-brand"));
-            List<WebElement> divElements = drvrJs.findElements(By.className("js-plp-prices-div"));
+            List<WebElement> imageElements = driver.findElements(By.className("products-grid__image-link-img"));
+            List<WebElement> titleElements = driver.findElements(By.className("product-name"));
+            List<WebElement> brandElements = driver.findElements(By.className("product-brand"));
+            List<WebElement> divElements = driver.findElements(By.className("js-plp-prices-div"));
             List<WebElement> priceElements = new ArrayList<>();
             for (WebElement divElement : divElements) {
                 List<WebElement> prices = divElement.findElements(By.className("plp_price"));
                 priceElements.addAll(prices);
             }
-            List<WebElement> urlElements = drvrJs.findElements(By.xpath("(//a[@class='u-text-decoration--none js-plp-pdp-link2 product-link'])"));
+            List<WebElement> urlElements = driver.findElements(By.xpath("(//a[@class='u-text-decoration--none js-plp-pdp-link2 product-link'])"));
 
             if (!imageElements.isEmpty() || !titleElements.isEmpty() || !brandElements.isEmpty() ||
                     (!priceElements.isEmpty() || !urlElements.isEmpty())) {
@@ -116,11 +127,26 @@ public class WebScrapRevolve {
             } else {
                 System.out.println("No product found.");
             }
+        } catch (WebDriverException e) {
+            System.out.println("The Chrome Revolve tab was closed while the program was still running.");
+        } catch (NullPointerException npex) {
+            System.out.println("Null Pointer Exception: " + npex.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
+    /**
+     * Writes product information to an Excel file.
+     *
+     * @param image    List of product images.
+     * @param title    List of product titles.
+     * @param brand    List of product brands.
+     * @param price    List of product prices.
+     * @param url      List of product URLs.
+     * @param fileName Name of the Excel file to save the product information.
+     * @throws IOException If an I/O error occurs.
+     */
     private void writeProductInfoToXLSX(List<String> image, List<String> title, List<String> brand, List<String> price, List<String> url, String fileName) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Product Info");

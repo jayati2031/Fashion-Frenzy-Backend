@@ -19,16 +19,16 @@ import java.util.stream.Collectors;
 public class SendDeals {
 
     // Email properties
-    private static final String FROM_EMAIL = "frenzyfashionacc";
-    private static final String EMAIL_SUBJECT = "Fashion-Frenzy Top Deals";
+    private static final String FROM_EMAIL = "frenzyfashionacc"; // Sender's email address
+    private static final String EMAIL_SUBJECT = "Fashion-Frenzy Top Deals"; // Subject of the email
     private static final String EMAIL_TEMPLATE = """
             Hello.. Sale is going on the fashion frenzy....!
 
             Here are the top deals:
-            """;
-    private static final String EMAIL_REGEX = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b";
+            """; // Template for the email body
+    private static final String EMAIL_REGEX = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"; // Regex pattern for email validation
 
-    private final Properties emailProperties;
+    private final Properties emailProperties; // Properties for configuring email session
 
     /**
      * Constructor to initialize email properties.
@@ -42,7 +42,9 @@ public class SendDeals {
     }
 
     /**
-     * Sends hot deals via email.
+     * Sends hot deals via email to recipients.
+     *
+     * @param productInfo list of product information to include in the email
      */
     public void sendDeals(List<Map<String, String>> productInfo) {
         String emailContent;
