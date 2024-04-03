@@ -1,6 +1,7 @@
 package com.example.fashionfrenzy;
 
 import com.example.fashionfrenzy.controller.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ public class FashionFrenzy {
     static ProductSearchController productSearchController = new ProductSearchController(productSearch, frequencyCount, pageRanking, topSearches, fetchProductsController);
     static ProductWordCompletionController productWordCompletionController = new ProductWordCompletionController(fetchProductsController);
     static FrequencyCountController frequencyCountController = new FrequencyCountController(frequencyCount);
+    static List<Map<String, String>> products;
 
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
@@ -40,7 +42,8 @@ public class FashionFrenzy {
             System.out.println(ANSI_BLUE + "Find the best fashion products of different brands." + ANSI_RESET);
 
             String userName = getValidInput("Please enter your name: ", scanner);
-            String userEmail = getValidInput("Please enter your email: ", scanner);
+            System.out.println("Please enter your email: ");
+            String userEmail = scanner.nextLine();
             //TO-DO add error handling here
             userDataController.registerUser(userName, userEmail);
 
@@ -88,26 +91,43 @@ public class FashionFrenzy {
                             int sortBy = getValidNumericInput("Do you want to sort products by 1)Brand, 2)Title, 3) Price", scanner);
                             int sortOrderInput = getValidNumericInput("Ascending(1) or Descending(0) order", scanner);
                             boolean sortOrder = sortOrderInput == 1;
-                            productSortController.getSortedProducts(gender, category, sortBy, sortOrder);
-                            //TO-DO print the results
+                            products = productSortController.getSortedProducts(gender, category, sortBy, sortOrder);
+                            for (Map<String, String> product : products) {
+                                for (Map.Entry<String, String> entry : product.entrySet()) {
+                                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                                }
+                                System.out.println("----------------------");
+                            }
                             break;
                         case 4:
                             filterProducts(gender, category);
                             break;
                         case 5:
                             String query = getValidInput("Enter a query to search in all three websites: ", scanner);
-                            pageRankingController.pageRanking(gender, category, query);
-                            //TO-DO print the results
+                            products = pageRankingController.pageRanking(gender, category, query);
+                            for (Map<String, String> product : products) {
+                                for (Map.Entry<String, String> entry : product.entrySet()) {
+                                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                                }
+                                // Print a separator between products
+                                System.out.println("----------------------");
+                            }
                             break;
                         case 6:
                             System.out.println("Top 3 trends on our website:");
-                            topSearchesController.getTopTrendingSearches();
-                            //TO-DO print the results
+                            List<Map<String, Integer>> topSearches = topSearchesController.getTopTrendingSearches();
+                            for (Map<String, Integer> topSearch : topSearches) {
+                                for (Map.Entry<String, Integer> entry : topSearch.entrySet()) {
+                                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                                }
+                                // Print a separator between products
+                                System.out.println("----------------------");
+                            }
                             break;
                         case 7:
                             System.out.println("Sending hot deals to the users...");
-                            sendDealsController.sendDealsByEmail();
-                            //TO-DO print the results
+                            ResponseEntity<String> res = sendDealsController.sendDealsByEmail();
+                            System.out.println(res);
                             return;
                         case 8:
                             System.out.println("Exiting Fashion Frenzy. Goodbye!");
@@ -185,18 +205,22 @@ public class FashionFrenzy {
             System.out.println("Product Search Sub - Options:");
             System.out.println("1. Spell Check");
             System.out.println("2. Word Completion");
-            System.out.println("4. Frequency Count");
+            System.out.println("3. Frequency Count");
 
             int searchOption = Integer.parseInt(scanner.nextLine());
 
             switch (searchOption) {
                 case 1:
-                    productSearchController.performSpellCheck(gender, category, searchTitle);
-                    //TO-DO print the results
+                    List<String> spellcheck = productSearchController.performSpellCheck(gender, category, searchTitle);
+                    for(String spell: spellcheck) {
+                        System.out.println(spell);
+                    }
                     break;
                 case 2:
-                    productWordCompletionController.suggestWords(gender, category, searchTitle);
-                    //TO-DO print the results
+                    List<String> suggestWords =productWordCompletionController.suggestWords(gender, category, searchTitle);
+                    for(String suggestWord: suggestWords) {
+                        System.out.println(suggestWord);
+                    }
                     break;
                 case 3:
                     frequencyCountController.getFrequencyCount(gender,category,searchTitle);
@@ -243,16 +267,26 @@ public class FashionFrenzy {
                 System.out.print("Enter brand names separated by commas: ");
                 brandInput = scanner.nextLine();
                 brands = brandInput.split(",");
-                productFilterController.filterProductsByBrand(gender, category, brands);
-                //TO-DO print the results
+                products = productFilterController.filterProductsByBrand(gender, category, brands);
+                for (Map<String, String> product : products) {
+                    for (Map.Entry<String, String> entry : product.entrySet()) {
+                        System.out.println(entry.getKey() + ": " + entry.getValue());
+                    }
+                    System.out.println("----------------------");
+                }
                 break;
             case 2:
                 System.out.print("Enter the minimum price: ");
                 minPrice = scanner.nextDouble();
                 System.out.print("Enter the maximum price: ");
                 maxPrice = scanner.nextDouble();
-                productFilterController.filterProductsByPriceRange(gender, category, minPrice, maxPrice);
-                //TO-DO print the results
+                products = productFilterController.filterProductsByPriceRange(gender, category, minPrice, maxPrice);
+                for (Map<String, String> product : products) {
+                    for (Map.Entry<String, String> entry : product.entrySet()) {
+                        System.out.println(entry.getKey() + ": " + entry.getValue());
+                    }
+                    System.out.println("----------------------");
+                }
                 break;
             case 3:
                 System.out.print("Enter brand names separated by commas: ");
@@ -262,8 +296,13 @@ public class FashionFrenzy {
                 minPrice = scanner.nextDouble();
                 System.out.print("Enter the maximum price: ");
                 maxPrice = scanner.nextDouble();
-                productFilterController.filterProductsByBrandAndPriceRange(gender, category, brands, minPrice, maxPrice);
-                //TO-DO print the results
+                products = productFilterController.filterProductsByBrandAndPriceRange(gender, category, brands, minPrice, maxPrice);
+                for (Map<String, String> product : products) {
+                    for (Map.Entry<String, String> entry : product.entrySet()) {
+                        System.out.println(entry.getKey() + ": " + entry.getValue());
+                    }
+                    System.out.println("----------------------");
+                }
                 break;
             default:
                 System.out.println("Invalid option selected.");

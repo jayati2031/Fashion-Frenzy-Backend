@@ -9,6 +9,7 @@ public class FashionWebsitesWebScrapper {
      * @param category The category of products to scrape (e.g., "shirt", "jeans").
      */
     public static void scrapeProductInfo(String gender, String category) {
+        category = category.substring(0, 1).toUpperCase() + category.substring(1).toLowerCase();
         try {
             // Scrape products for women
             // Perform scraping
