@@ -46,7 +46,7 @@ public class ProductFilterController {
             for (Map<String, String> product : products) {
                 productFilter.insert(product); // Insert product into the B-tree
             }
-            return productFilter.filterProductsByBrands(brands);
+            return productFilter.filterProductsByBrands(products, brands);
         } catch (IOException e) {
             // Handle IOException appropriately
             handleIOException(e);
@@ -66,7 +66,7 @@ public class ProductFilterController {
             for (Map<String, String> product : products) {
                 productFilter.insert(product); // Insert product into the B-tree
             }
-            return productFilter.filterProductsByBothBrandAndPriceRange(brands, minPrice, maxPrice);
+            return productFilter.filterProductsByBothBrandAndPriceRange(products, brands, minPrice, maxPrice);
         } catch (IOException e) {
             // Handle IOException appropriately
             handleIOException(e);

@@ -147,9 +147,7 @@ public class ProductFilter {
     }
 
     // Filter products by brands
-    public List<Map<String, String>> filterProductsByBrands(String[] brands) throws IOException {
-        List<Map<String, String>> products = getAllProducts();
-
+    public List<Map<String, String>> filterProductsByBrands(List<Map<String, String>> products, String[] brands) throws IOException {
         System.out.println("Products for selected brand(s):");
         List<Map<String, String>> filteredProducts = new ArrayList<>();
         for (String brandInput : brands) {
@@ -170,9 +168,9 @@ public class ProductFilter {
     }
 
     // Filter products by both brand and price range
-    public List<Map<String, String>> filterProductsByBothBrandAndPriceRange(String[] brands, double minPrice, double maxPrice) throws IOException {
-        List<Map<String, String>> products = getAllProducts();
-
+    public List<Map<String, String>> filterProductsByBothBrandAndPriceRange(List<Map<String, String>> products,
+                                                                            String[] brands, double minPrice, double maxPrice)
+            throws IOException {
         System.out.println("Products for selected brand(s) and price range:");
         List<Map<String, String>> filteredProducts = new ArrayList<>();
 
@@ -183,15 +181,15 @@ public class ProductFilter {
             for (Map<String, String> product : products) {
                 String brand = product.get("Brand");
                 double price = Double.parseDouble(product.get("Price").replaceAll("[^\\d.]", ""));
-                if (brand.toLowerCase().contains(brandInput.trim().toLowerCase()) && price >= minPrice && price <= maxPrice) {
+                boolean contains = brand.toLowerCase().contains(brandInput.trim().toLowerCase());
+                if (contains && price >= minPrice && price <= maxPrice) {
                     filteredProducts.add(product);
                     brandFound = true;
                     productsFound = true;
-                } else if (brand.toLowerCase().contains(brandInput.trim().toLowerCase())) {
+                } else if (contains) {
                     brandFound = true;
                 }
             }
-
             if (!brandFound) {
                 System.out.println("Sorry!.... Brand with the name " + brandInput + " doesn't exist");
             } else if (!productsFound) {
@@ -205,27 +203,6 @@ public class ProductFilter {
             printProducts(filteredProducts);
         }
         return filteredProducts;
-    }
-
-    // Read all product information from Excel files
-    private List<Map<String, String>> getAllProducts() throws IOException {
-        List<Map<String, String>> products = new ArrayList<>();
-        String[] files = {
-                "src\\main\\resources\\womenBoohooDress.xlsx",
-                "src\\main\\resources\\womenAmazonDress.xlsx",
-                "src\\main\\resources\\womenRevolveDress.xlsx"
-        };
-        for (String file : files) {
-            try {
-                List<Map<String, String>> data = readProductInfoFromExcel(file);
-                products.addAll(data);
-            } catch (IOException e) {
-                // Handle IOException when reading Excel files
-                System.err.println("An error occurred while reading product information from " + file + ": " + e.getMessage());
-                throw e; // Re-throw the exception to the calling method
-            }
-        }
-        return products;
     }
 
     // Print product information

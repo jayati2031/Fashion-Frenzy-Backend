@@ -14,7 +14,7 @@ public class FetchProductsController {
 
     @GetMapping("")
     public List<Map<String, String>> getAllProducts() {
-        List<String> genders = List.of("men", "women");
+        List<String> genders = List.of("women", "men");
         List<String> categoriesForMen = List.of("shirt", "hoodie", "jeans", "coat", "sweater");
         List<String> categoriesForWomen = List.of("dress", "top", "jeans", "coat", "sweater");
         List<Map<String, String>> allProducts = new ArrayList<>();
