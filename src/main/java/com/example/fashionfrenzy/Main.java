@@ -13,9 +13,7 @@ public class Main {
     private static final String ANSI_BLUE = "\u001B[34m";
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        try {
+        try (Scanner scanner = new Scanner(System.in)) {
             // Welcome message
             System.out.println(ANSI_RED + "\n============ WELCOME TO FASHION FRENZY============" + ANSI_RESET);
             System.out.println(ANSI_BLUE + "Find the best fashion products of different brands." + ANSI_RESET);
@@ -60,7 +58,7 @@ public class Main {
                                 continueLoop = false; // Set the variable to false to exit the outer loop
                             } else {
                                 // Handle invalid input
-                                System.out.println("Invalid input. Please provide either 'yes' or 'no'.");
+                                System.out.println(ANSI_RED + "Invalid input. Please provide either 'yes' or 'no'." + ANSI_RESET);
                             }
                             break; // Exit the category input loop if a valid category is provided
                         } else {
@@ -76,10 +74,8 @@ public class Main {
         } catch (Exception e) {
             // Catch any exception that occurs during execution and display error message
             System.out.println("An error occurred: " + e.getMessage());
-        } finally {
-            // Ensure the scanner is closed to release resources
-            scanner.close();
         }
+        // Ensure the scanner is closed to release resources
     }
 
     // Method to check if the selected category is valid

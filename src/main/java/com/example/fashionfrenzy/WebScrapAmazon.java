@@ -37,6 +37,9 @@ public class WebScrapAmazon {
             drvrJs.get(urlToCrawlJs);
             WebDriverWait wtJs = new WebDriverWait(drvrJs, Duration.ofSeconds(20));
 
+            genderJs = genderJs.substring(0, 1).toUpperCase() + genderJs.substring(1).toLowerCase();
+            categoryJs = categoryJs.substring(0, 1).toUpperCase() + categoryJs.substring(1).toLowerCase();
+
             WebElement drpDwnJs = drvrJs.findElement(By.id("searchDropdownBox"));
             Select slctJs = new Select(drpDwnJs);
             List<WebElement> options = slctJs.getOptions();
@@ -66,7 +69,7 @@ public class WebScrapAmazon {
     }
 
     /**
-     * Scrapes product information from the Amazon page and writes it to an Excel file.
+     * Parses product information from the Amazon page and writes it to an Excel file.
      *
      * @param fileName Name of the Excel file to save the scraped product information.
      */

@@ -22,11 +22,11 @@ public class WebScrapBoohoo {
      * Crawls Boohoo website using JavaScript to scrape product information based on given parameters.
      *
      * @param urlToCrawlJs URL of the Boohoo website to crawl.
-     * @param categoryJs   Product category to search for on the Boohoo page.
-     * @param searchKeyJs   Search keyword to use on the Boohoo page.
+     * @param genderJs   Product category to search for on the Boohoo page.
+     * @param categoryJs   Search keyword to use on the Boohoo page.
      * @param fileNameJs   Name of the Excel file to save the scraped product information.
      */
-    public void crawlBoohooJs(String urlToCrawlJs, String categoryJs, String searchKeyJs, String fileNameJs) {
+    public void crawlBoohooJs(String urlToCrawlJs, String genderJs, String categoryJs, String fileNameJs) {
         WebDriverManager.chromedriver().setup();
         ChromeOptions optionsJs = new ChromeOptions();
         optionsJs.addArguments("--start-maximized");
@@ -40,13 +40,16 @@ public class WebScrapBoohoo {
             WebElement clickAcceptCookies = waitJs.until(ExpectedConditions.elementToBeClickable(By.id("onetrust-accept-btn-handler")));
             clickAcceptCookies.click();
 
+            genderJs = genderJs.substring(0, 1).toUpperCase() + genderJs.substring(1).toLowerCase();
+            categoryJs = categoryJs.substring(0, 1).toUpperCase() + categoryJs.substring(1).toLowerCase();
+
             // Perform search
             WebElement searchBoxJs = waitJs.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@role='combobox']")));
             searchBoxJs.click();
             for (int cd = 0; cd < 50; cd++) {
                 searchBoxJs.sendKeys(Keys.BACK_SPACE);
             }
-            searchBoxJs.sendKeys(categoryJs + " " + searchKeyJs);
+            searchBoxJs.sendKeys(genderJs + " " + categoryJs);
             searchBoxJs.sendKeys(Keys.ENTER);
 
             waitJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
@@ -63,7 +66,7 @@ public class WebScrapBoohoo {
     }
 
     /**
-     * Scrapes product information from the Boohoo page and writes it to an Excel file.
+     * Parses product information from the Boohoo page and writes it to an Excel file.
      *
      * @param fileName Name of the Excel file to save the scraped product information.
      */

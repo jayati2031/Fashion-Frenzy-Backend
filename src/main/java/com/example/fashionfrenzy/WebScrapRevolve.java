@@ -22,11 +22,11 @@ public class WebScrapRevolve {
      * Crawls the Revolve website using JavaScript to scrape product information based on given parameters.
      *
      * @param urlToCrawlJs URL of the Revolve website to crawl.
-     * @param categoryJs   Product category to search for on the Revolve page.
-     * @param searchKeyJs  Search keyword to use on the Revolve page.
+     * @param genderJs   Product category to search for on the Revolve page.
+     * @param categoryJs  Search keyword to use on the Revolve page.
      * @param fileNameJs   Name of the Excel file to save the scraped product information.
      */
-    public void crawlRevolveJs(String urlToCrawlJs, String categoryJs, String searchKeyJs, String fileNameJs) {
+    public void crawlRevolveJs(String urlToCrawlJs, String genderJs, String categoryJs, String fileNameJs) {
         WebDriverManager.chromedriver().setup();
         ChromeOptions optionsJs = new ChromeOptions();
         optionsJs.addArguments("--start-maximized");
@@ -40,9 +40,12 @@ public class WebScrapRevolve {
             WebElement closeButton = driver.findElement(By.id("ntf_just_let_shop"));
             closeButton.click();
 
+            genderJs = genderJs.substring(0, 1).toUpperCase() + genderJs.substring(1).toLowerCase();
+            genderJs = genderJs.substring(0, 1).toUpperCase() + genderJs.substring(1).toLowerCase();
+
             // Select gender based on category
             WebElement selectGender;
-            if (categoryJs.equals("Men")) {
+            if (genderJs.equals("Men")) {
                 selectGender = waitJs.until(ExpectedConditions.elementToBeClickable(driver.findElements(By.className("h5-secondary")).get(1)));
             } else {
                 selectGender = waitJs.until(ExpectedConditions.elementToBeClickable(driver.findElements(By.className("h5-secondary")).get(0)));
@@ -52,7 +55,7 @@ public class WebScrapRevolve {
             // Perform search
             WebElement searchBoxJs = waitJs.until(ExpectedConditions.elementToBeClickable(By.id("search_term_new")));
             searchBoxJs.click();
-            searchBoxJs.sendKeys(searchKeyJs);
+            searchBoxJs.sendKeys(categoryJs);
             searchBoxJs.sendKeys(Keys.ENTER);
 
             waitJs.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loader")));
@@ -74,7 +77,7 @@ public class WebScrapRevolve {
     }
 
     /**
-     * Scrapes product information from the Revolve page and writes it to an Excel file.
+     * Parses product information from the Revolve page and writes it to an Excel file.
      *
      * @param fileName Name of the Excel file to save the scraped product information.
      */
