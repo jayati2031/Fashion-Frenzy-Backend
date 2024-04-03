@@ -13,7 +13,7 @@ import java.util.*;
 public class FetchProductsController {
 
     @GetMapping("")
-    public List<Map<String, String>> getAllProducts() {
+    public List<Map<String, String>> getAllProducts(@RequestParam Integer maxResults) {
         List<String> genders = List.of("women", "men");
         List<String> categoriesForMen = List.of("shirt", "hoodie", "jeans", "coat", "sweater");
         List<String> categoriesForWomen = List.of("dress", "top", "jeans", "coat", "sweater");
@@ -27,14 +27,14 @@ public class FetchProductsController {
                 categories = categoriesForWomen;
             }
             for (String category : categories) {
-                allProducts.addAll(getLimitedProductsByCategory(gender, category));
+                allProducts.addAll(getLimitedProductsByCategory(gender, category, maxResults));
             }
         }
         return allProducts;
     }
 
     @GetMapping("/gender")
-    public List<Map<String, String>> getProductsByGender(@RequestParam String gender) {
+    public List<Map<String, String>> getProductsByGender(@RequestParam String gender, @RequestParam Integer maxResults) {
         String genderChoice = gender.toLowerCase();
         if (isValidGender(genderChoice)) {
             throw new IllegalArgumentException("Invalid gender");
@@ -47,7 +47,7 @@ public class FetchProductsController {
             categories = List.of("dress", "top", "jeans", "coat", "sweater");
         }
         for (String category : categories) {
-            allProducts.addAll(getLimitedProductsByCategory(gender, category));
+            allProducts.addAll(getLimitedProductsByCategory(gender, category, maxResults));
         }
         return allProducts;
     }
@@ -67,12 +67,12 @@ public class FetchProductsController {
         return FetchProductsFromExcelBasedOnCategory.readData(filePaths);
     }
 
-    private List<Map<String, String>> getLimitedProductsByCategory(String gender, String category) {
+    protected List<Map<String, String>> getLimitedProductsByCategory(String gender, String category, Integer maxResults) {
         List<Map<String, String>> products = getProductsByCategory(gender, category);
         List<Map<String, String>> limitedProducts = new ArrayList<>();
         int count = 0;
         for (Map<String, String> product : products) {
-            if (count < 10) {
+            if (count < maxResults) {
                 limitedProducts.add(product);
                 count++;
             }

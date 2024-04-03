@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * This class sends hot deals via email to recipients listed in a CSV file.
@@ -20,8 +21,11 @@ public class SendDeals {
     // Email properties
     private static final String FROM_EMAIL = "frenzyfashionacc";
     private static final String EMAIL_SUBJECT = "Fashion-Frenzy Top Deals";
-    private static final String EMAIL_TEMPLATE = "Hello.. Sale is going on the fashion frenzy....!\n\n" +
-            "Here are the top deals:\n";
+    private static final String EMAIL_TEMPLATE = """
+            Hello.. Sale is going on the fashion frenzy....!
+
+            Here are the top deals:
+            """;
     private static final String EMAIL_REGEX = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b";
 
     private final Properties emailProperties;
@@ -40,22 +44,13 @@ public class SendDeals {
     /**
      * Sends hot deals via email.
      */
-    public void sendDeals() {
-        StringBuilder emailContent = new StringBuilder(EMAIL_TEMPLATE);
+    public void sendDeals(List<Map<String, String>> productInfo) {
+        String emailContent;
         try {
-            // Read product information from Excel
-            List<Map<String, String>> productInfo = FetchProductsFromExcelBasedOnCategory.readData(Collections.singletonList("product_info.xlsx"));
             // Include details of up to 5 products in the email content
-            for (int i = 0; i < Math.min(productInfo.size(), 5); i++) {
-                Map<String, String> productDetails = productInfo.get(i);
-                emailContent.append("Title: ").append(productDetails.get("Title")).append("\n");
-                emailContent.append("Brand: ").append(productDetails.get("Brand")).append("\n");
-                emailContent.append("Price: ").append(productDetails.get("Price")).append("\n");
-                emailContent.append("URL: ").append(productDetails.get("URL")).append("\n");
-                emailContent.append("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-            }
+            emailContent = productInfo.stream().map(productDetails -> "Title: " + productDetails.get("Title") + "\n" + "Brand: " + productDetails.get("Brand") + "\n" + "Price: " + productDetails.get("Price") + "\n" + "URL: " + productDetails.get("URL") + "\n" + "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n").collect(Collectors.joining("", EMAIL_TEMPLATE, ""));
             // Send emails to recipients
-            boolean allEmailsSentSuccessfully = sendEmails(readEmailsFromCSV(), emailContent.toString());
+            boolean allEmailsSentSuccessfully = sendEmails(readEmailsFromCSV(), emailContent);
             if (allEmailsSentSuccessfully) {
                 System.out.println("Emails sent successfully to all recipients.");
             } else {
@@ -63,7 +58,6 @@ public class SendDeals {
             }
         } catch (Exception e) {
             System.out.println("An error occurred while sending hot deals: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -79,7 +73,6 @@ public class SendDeals {
                     .toArray(String[]::new); // Convert extracted emails to an array
         } catch (Exception e) {
             System.out.println("An error occurred while reading email addresses from CSV: " + e.getMessage());
-            e.printStackTrace();
             return new String[0];
         }
     }
@@ -111,7 +104,6 @@ public class SendDeals {
             } catch (Exception e) {
                 allEmailsSentSuccessfully = false;
                 System.out.println("Failed to send email to: " + recipient + ". Error: " + e.getMessage());
-                e.printStackTrace();
             }
         }
 
@@ -134,18 +126,7 @@ public class SendDeals {
             }
         } catch (Exception e) {
             System.out.println("An error occurred while extracting emails: " + e.getMessage());
-            e.printStackTrace();
         }
         return emails;
-    }
-
-    /**
-     * Main method to execute the program.
-     *
-     * @param args Command line arguments
-     */
-    public static void main(String[] args) {
-        SendDeals sendDeals = new SendDeals();
-        sendDeals.sendDeals();
     }
 }

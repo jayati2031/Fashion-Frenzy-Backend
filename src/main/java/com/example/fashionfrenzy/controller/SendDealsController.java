@@ -1,46 +1,37 @@
 package com.example.fashionfrenzy.controller;
 
-import com.example.fashionfrenzy.FetchProductsFromExcelBasedOnCategory;
 import com.example.fashionfrenzy.SendDeals;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
+@RequestMapping("/api/products")
 public class SendDealsController {
+    private final SendDeals sendDeals;
+    private final FetchProductsController fetchProductsController;
 
     @Autowired
-    private SendDeals sendDeals;
+    public SendDealsController(SendDeals sendDeals, FetchProductsController fetchProductsController) {
+        this.sendDeals = sendDeals;
+        this.fetchProductsController = fetchProductsController;
+    }
 
     @GetMapping("/send-deals")
-    public String showSendDealsForm(Model model) {
-        model.addAttribute("to", "");
-        return "send-deals";
-    }
-
-    @PostMapping("/send-deals")
-    public String sendDeals(@RequestParam("to") String to, Model model) {
-//        boolean isSent = sendDeals.sendEmail(to, "frenzyfashionacc@gmail.com", "Fashion-Frenzy Top Deals", getFashionDealText());
-//        if (isSent) {
-//            model.addAttribute("message", "Email sent successfully!");
-//        } else {
-//            model.addAttribute("message", "There was a problem sending the email.");
-//        }
-        return "send-deals";
-
-    }
-
-    private String getFashionDealText() {
-        StringBuilder textBuilder = new StringBuilder();
-        textBuilder.append("Hello.. Sale is going on the fashion frenzy....!\n\n");
-        textBuilder.append("Here are the top deals:\n");
-        textBuilder.append(FetchProductsFromExcelBasedOnCategory.readData(Arrays.asList("product_info.xlsx")));
-        return textBuilder.toString();
+    public ResponseEntity<String> sendDealsByEmail() {
+        try {
+            List<Map<String, String>> products = fetchProductsController.getAllProducts(1);
+            sendDeals.sendDeals(products);
+            return ResponseEntity.ok("Deals sent successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send deals. Error: " + e.getMessage());
+        }
     }
 }
