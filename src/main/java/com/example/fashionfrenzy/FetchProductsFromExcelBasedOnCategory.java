@@ -50,45 +50,4 @@ public class FetchProductsFromExcelBasedOnCategory {
         }
         return productsList;
     }
-
-    private static void getFileAndPrintProducts(String genderChoice, String categoryChoice) {
-        categoryChoice = Character.toUpperCase(categoryChoice.charAt(0)) + categoryChoice.substring(1);
-        List<String> websites = List.of(new String[]{"Amazon", "Boohoo", "Revolve"});
-        List<String> filePaths = new ArrayList<>();
-        for(String website: websites) {
-            filePaths.add("src/main/resources/" + genderChoice + website + categoryChoice + ".xlsx");
-        }
-
-        List<Map<String, String>> products = readData(filePaths);
-        System.out.println("Products in category " + categoryChoice + " from all sites:");
-        for (Map<String, String> product : products) {
-            System.out.println("Image: " + product.get("Image"));
-            System.out.println("Brand: " + product.get("Brand"));
-            System.out.println("Title: " + product.get("Title"));
-            System.out.println("Price: " + product.get("Price"));
-            System.out.println("URL: " + product.get("URL"));
-            System.out.println();
-        }
-    }
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Select gender (men or women): ");
-        String genderChoice = scanner.nextLine();
-
-        // Display category options
-        String categoryChoice = "";
-        if(genderChoice.equals("men")) {
-            System.out.println("Select category from the following (Shirt, Hoodie, Jeans, Coat, Sweater):");
-            categoryChoice = scanner.nextLine().toLowerCase();
-            getFileAndPrintProducts(genderChoice, categoryChoice);
-        } else if(genderChoice.equals("women")) {
-            System.out.println("Select category from the following (Dress, Top, Jeans, Coat, Sweater):");
-            categoryChoice = scanner.nextLine().toLowerCase();
-            getFileAndPrintProducts(genderChoice, categoryChoice);
-        } else {
-            System.out.println("Incorrect gender");
-        }
-        scanner.close();
-    }
 }

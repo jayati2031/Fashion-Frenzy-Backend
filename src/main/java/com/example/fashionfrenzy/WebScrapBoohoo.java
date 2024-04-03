@@ -59,15 +59,12 @@ public class WebScrapBoohoo {
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
-            WebElement categoryElement = drvrJs.findElement(By.className("b-header_search-keywords"));
             List<WebElement> imageElements = drvrJs.findElements(By.xpath("(//img[@class='null'])"));
             List<WebElement> titleElements = drvrJs.findElements(By.className("b-product_tile-link"));
             List<WebElement> priceElements = drvrJs.findElements(By.xpath("(//span[@class='b-price-item m-new'])"));
             List<WebElement> urlElements = drvrJs.findElements(By.xpath("(//a[@class='b-product_tile-image_link'])"));
 
-            if (categoryElement != null || !imageElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty()|| !urlElements.isEmpty()) {
-                assert categoryElement != null;
-                String category = categoryElement.getText();
+            if (!imageElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty()|| !urlElements.isEmpty()) {
                 List<String> images = new ArrayList<>();
                 for (WebElement element : imageElements) {
                     String src = element.getAttribute("src");
@@ -88,16 +85,7 @@ public class WebScrapBoohoo {
                 }
 
                 // Print product information
-                System.out.println("Category: " + category);
-                System.out.println("----------------------------------");
-                for (int j = 0; j < title.size() && j < price.size() && j < urls.size(); j++) {
-                    System.out.println("Image Src: " + images.get(j));
-                    System.out.println("Brand: Boohoo");
-                    System.out.println("Title: " + title.get(j));
-                    System.out.println("Price: " + price.get(j));
-                    System.out.println("Url: " + urls.get(j));
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                }
+                System.out.println("Scrapped " + Math.min(Math.min(images.size(), title.size()), Math.min(price.size(), urls.size())) + " products from Boohoo");
 
                 // Write product information to xlsx
                 writeProductInfoToXLSX(images, title, price, urls, fileName);

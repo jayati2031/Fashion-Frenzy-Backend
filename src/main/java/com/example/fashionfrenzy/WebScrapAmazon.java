@@ -61,16 +61,13 @@ public class WebScrapAmazon {
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
-            WebElement categoryElement = drvrJs.findElement(By.xpath("(//span[@class='a-size-base a-color-base a-text-bold'])"));
             List<WebElement> imageElements = drvrJs.findElements(By.xpath("(//img[@class='s-image'])"));
             List<WebElement> brandElements = drvrJs.findElements(By.xpath("(//h2[@class='a-size-mini s-line-clamp-1'])"));
             List<WebElement> titleElements = drvrJs.findElements(By.xpath("(//span[@class='a-size-base-plus a-color-base a-text-normal'])"));
             List<WebElement> priceElements = drvrJs.findElements(By.xpath("(//span[@class='a-price'])"));
             List<WebElement> urlElements = drvrJs.findElements(By.xpath("(//a[@class='a-link-normal s-underline-text s-underline-link-text s-link-style a-text-normal'])"));
 
-            if (categoryElement != null || !imageElements.isEmpty() || !brandElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty()) {
-                assert categoryElement != null;
-                String category = categoryElement.getText();
+            if (!imageElements.isEmpty() || !brandElements.isEmpty() || !titleElements.isEmpty() || !priceElements.isEmpty()) {
                 List<String> images = new ArrayList<>();
                 for (WebElement element : imageElements) {
                     String src = element.getAttribute("src");
@@ -96,17 +93,7 @@ public class WebScrapAmazon {
                 }
 
                 // Print product information
-                System.out.println("Category: " + category);
-                System.out.println("----------------------------------");
-                for (int j = 0; j < images.size() && j < brand.size() && j < title.size()
-                        && j < price.size() && j < urls.size(); j++) {
-                    System.out.println("Image Src: " + images.get(j));
-                    System.out.println("Brand: " + brand.get(j));
-                    System.out.println("Title: " + title.get(j));
-                    System.out.println("Price: " + price.get(j));
-                    System.out.println("Url: " + urls.get(j));
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                }
+                System.out.println("Scrapped " + Math.min(Math.min(images.size(), title.size()), Math.min(price.size(), urls.size())) + " products from Amazon");
 
                 // Write product information to xlsx
                 writeProductInfoToXLSX(images, brand, title, price, urls, fileName);

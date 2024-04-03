@@ -70,7 +70,6 @@ public class WebScrapRevolve {
     public void scrapeProductInfoJs(String fileName) {
         try {
             // Extract product information
-            WebElement categoryElement = drvrJs.findElement(By.xpath("(//h1[@class='page-title__hed u-margin-t--sm u-margin-b--none'])"));
             Thread.sleep(2000);
             List<WebElement> imageElements = drvrJs.findElements(By.className("products-grid__image-link-img"));
             List<WebElement> titleElements = drvrJs.findElements(By.className("product-name"));
@@ -83,10 +82,8 @@ public class WebScrapRevolve {
             }
             List<WebElement> urlElements = drvrJs.findElements(By.xpath("(//a[@class='u-text-decoration--none js-plp-pdp-link2 product-link'])"));
 
-            if (categoryElement != null || !imageElements.isEmpty() || !titleElements.isEmpty() || !brandElements.isEmpty() ||
+            if (!imageElements.isEmpty() || !titleElements.isEmpty() || !brandElements.isEmpty() ||
                     (!priceElements.isEmpty() || !urlElements.isEmpty())) {
-                assert categoryElement != null;
-                String category = categoryElement.getText();
                 List<String> images = new ArrayList<>();
                 for (int i = 0; i < Math.min(imageElements.size(), 40); i++) {
                     String srcset = imageElements.get(i).getAttribute("srcset");
@@ -112,16 +109,7 @@ public class WebScrapRevolve {
                 }
 
                 // Print product information
-                System.out.println("Category: " + category);
-                System.out.println("----------------------------------");
-                for (int j = 0; j < title.size() && j < brand.size() && j < price.size() && j < urls.size(); j++) {
-                    System.out.println("Image Src: " + images.get(j));
-                    System.out.println("Brand: " + brand.get(j));
-                    System.out.println("Title: " + title.get(j));
-                    System.out.println("Price: " + price.get(j));
-                    System.out.println("Url: " + urls.get(j));
-                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                }
+                System.out.println("Scrapped " + Math.min(Math.min(images.size(), title.size()), Math.min(price.size(), urls.size())) + " products from Revolve");
 
                 // Write product information to xlsx
                 writeProductInfoToXLSX(images, title, brand, price, urls, fileName);
